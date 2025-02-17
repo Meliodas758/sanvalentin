@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>San Valentín</title>
+    <style>
+        body {
+            background: linear-gradient(180deg, #f8bbd0, #fce4ec);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: #880e4f;
+            margin: 0;
+            position: relative;
+            overflow: hidden;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .menu-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: #d81b60;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .menu {
+            position: absolute;
+            top: 60px;
+            left: 20px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: none;
+        }
+
+        .menu a {
+            display: block;
+            padding: 10px 20px;
+            text-decoration: none;
+            color: #d81b60;
+            font-size: 18px;
+        }
+
+        .menu a:hover {
+            background: #f8bbd0;
+        }
+
+        .section {
+            display: none;
+            text-align: center;
+            width: 100%;
+        }
+
+        .active {
+            display: block;
+        }
+
+        #gallery img {
+            width: 300px;
+            height: auto;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .gallery-buttons button {
+            background-color: #d81b60;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+
+        .heart {
+            position: absolute;
+            font-size: 24px;
+            color: red;
+            animation: floatUp 4s linear infinite;
+        }
+
+        @keyframes floatUp {
+            from {
+                transform: translateY(100vh);
+                opacity: 1;
+            }
+            to {
+                transform: translateY(-10vh);
+                opacity: 0;
+            }
+        }
+
+        #heartContainer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body onload="generarCorazones()">
+
+<button class="menu-button" onclick="toggleMenu()">☰ Menú</button>
+<div class="menu" id="menu">
+    <a href="#" onclick="showSection('inicio')">Inicio</a>
+    <a href="#" onclick="showSection('gallery')">Fotos</a>
+    <a href="#" onclick="showSection('canciones')">Canciones</a>
+    <a href="#" onclick="showSection('recuerdos')">Recuerdos</a>
+    <a href="#" onclick="showSection('carta')">Carta Especial</a>
+</div>
+
+<div id="heartContainer"></div>
+
+<div id="inicio" class="section active">
+    <h1 id="mensajeBienvenida">Bienvenida a nuestra historia de amor<br>(clave, fecha de matrimonio)</h1>
+    <div id="teclado" class="teclado">
+        <input type="password" id="clave" maxlength="4" readonly>
+        <div class="teclado-numerico">
+            <button onclick="agregarNumero('1')">1</button>
+            <button onclick="agregarNumero('2')">2</button>
+            <button onclick="agregarNumero('3')">3</button>
+            <button onclick="agregarNumero('4')">4</button>
+            <button onclick="agregarNumero('5')">5</button>
+            <button onclick="agregarNumero('6')">6</button>
+            <button onclick="agregarNumero('7')">7</button>
+            <button onclick="agregarNumero('8')">8</button>
+            <button onclick="agregarNumero('9')">9</button>
+            <button onclick="borrarNumero()">⌫</button>
+            <button onclick="agregarNumero('0')">0</button>
+            <button onclick="verificarClave()">✔</button>
+        </div>
+    </div>
+    <div id="reloj" class="oculto">
+        <h2>Tiempo juntos:</h2>
+        <p id="tiempoJuntos" class="reloj-texto"></p>
+    </div>
+</div>
+
+<style>
+    .teclado {
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .teclado-numerico {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-gap: 10px;
+        margin-top: 10px;
+    }
+
+    .teclado-numerico button {
+        padding: 10px;
+        font-size: 20px;
+        background-color: #d81b60;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .teclado-numerico button:hover {
+        background-color: #880e4f;
+    }
+
+    #clave {
+        width: 120px;
+        padding: 10px;
+        font-size: 18px;
+        text-align: center;
+        border: 2px solid #d81b60;
+        border-radius: 5px;
+        margin-bottom: 10px;
+    }
+
+    .oculto {
+        display: none;
+    }
+
+    /* Estilos para el reloj de tiempo juntos */
+    .reloj-texto {
+        font-size: 32px;
+        color: #333;
+        margin-top: 20px;
+        font-weight: bold;
+    }
+</style>
+
+<script>
+    let claveIngresada = "";
+    const claveCorrecta = "301221"; // Cambiar por la clave deseada
+
+    function agregarNumero(numero) {
+        if (claveIngresada.length < 6) {
+            claveIngresada += numero;
+            document.getElementById("clave").value = claveIngresada;
+        }
+    }
+
+    function borrarNumero() {
+        claveIngresada = claveIngresada.slice(0, -1);
+        document.getElementById("clave").value = claveIngresada;
+    }
+
+    function verificarClave() {
+        if (claveIngresada === claveCorrecta) {
+            document.getElementById("mensajeBienvenida").style.display = "none";
+            document.getElementById("teclado").style.display = "none";
+            document.getElementById("reloj").classList.remove("oculto");
+            iniciarReloj();
+        } else {
+            alert("Clave incorrecta. Intenta de nuevo.");
+            claveIngresada = "";
+            document.getElementById("clave").value = "";
+        }
+    }
+
+    function iniciarReloj() {
+        const inicioRelacion = new Date("2019-09-13T12:35:27"); // Cambiar por la fecha de inicio de la relación
+        actualizarReloj(inicioRelacion);
+        setInterval(() => actualizarReloj(inicioRelacion), 1000);
+    }
+
+    function actualizarReloj(inicioRelacion) {
+        const ahora = new Date();
+        const diferencia = ahora - inicioRelacion;
+
+        const años = Math.floor(diferencia / (1000 * 60 * 60 * 24 * 365.25));
+        const dias = Math.floor((diferencia % (1000 * 60 * 60 * 24 * 365.25)) / (1000 * 60 * 60 * 24));
+        const horas = Math.floor((diferencia % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutos = Math.floor((diferencia % (1000 * 60 * 60)) / (1000 * 60));
+        const segundos = Math.floor((diferencia % (1000 * 60)) / 1000);
+
+        document.getElementById("tiempoJuntos").innerText = `${años} años, ${dias} días, ${horas} horas, ${minutos} minutos, ${segundos} segundos`;
+    }
+</script>
+
+<div id="gallery" class="section">
+    <h2>Nuestras Fotos</h2>
+    <img id="galleryImage" src="foto11.jpg" alt="Foto de amor">
+    <div class="gallery-buttons">
+        <button onclick="prevImage()">⏪ Anterior</button>
+        <button onclick="nextImage()">Siguiente ⏩</button>
+    </div>
+</div>
+
+<div id="canciones" class="section">
+    <h2>Canciones que te dedico</h2>
+    <video id="videoPlayer" controls width="400">
+        <source id="videoSource" src="videoPlayer1.mp4" type="video/mp4">
+        Tu navegador no soporta la reproducción de video.
+    </video>
+    <br>
+    <button onclick="cambiarVideo('veidoPlayer1.mp4')">Canción 1</button>
+    <button onclick="cambiarVideo('videoPlayer2.mp4')">Canción 2</button>
+    <button onclick="cambiarVideo('videoPlayer3.mp4')">Canción 3</button>
+</div>
+
+<div id="recuerdos" class="section">
+    <h2>Recuerdos</h2>
+    <button onclick="mostrarRecuerdo('bodas')">💍 Nuestra Boda</button>
+    <button onclick="mostrarRecuerdo('serPadres')">👶 Cuando fuimos padres</button>
+    <button onclick="mostrarRecuerdo('ejercito')">🎖 Nuestro tiempo en el ejército</button>
+    <button onclick="mostrarRecuerdo('plazaNorte')">🏬 Plaza Norte</button>
+    <div id="recuerdoAnimado" class="recuerdo-contenido">
+        <!-- Aquí se mostrarán las burbujas animadas con el mensaje -->
+    </div>
+</div>
+
+<style>
+    /* Estilos para contenedor dinámico */
+    .recuerdo-contenido {
+        width: 100%;
+        height: 100%;
+        margin: 20px auto;
+        padding: 20px;
+        position: relative;
+        text-align: center;
+    }
+
+    .mostrar {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* Estilos de la burbuja realista */
+    .bubble {
+        width: 200px;
+        height: 200px;
+        background: radial-gradient(circle at 50% 50%, rgba(218, 95, 216, 0.984), rgba(255, 192, 203, 0.3), rgba(230, 230, 250, 0.7));
+        border-radius: 50%;
+        border: 2px solid rgba(216, 47, 208, 0.5);
+        box-shadow: inset 0 0 30px rgba(241, 80, 244, 0.786), 0 0 50px rgba(147, 112, 219, 0.3);
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        animation: float 6s ease-in-out infinite;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #000000;
+        font-size: 18px;
+        opacity: 0;
+        transition: opacity 1s;
+    }
+
+    @keyframes float {
+        0%, 100% {
+            transform: translate(-50%, -50%) translateY(0);
+        }
+        50% {
+            transform: translate(-50%, -50%) translateY(-20px);
+        }
+    }
+
+    /* Estilo para el texto estático dentro de la burbuja */
+    .bubble-text {
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Estilo para el brillo de la burbuja */
+    .bubble::before {
+        content: '';
+        position: absolute;
+        top: -10%;
+        left: 20%;
+        width: 60%;
+        height: 60%;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0) 70%);
+        opacity: 0.7;
+        z-index: 0;
+        transform: rotate(45deg);
+    }
+
+    /* Activar visibilidad de la burbuja */
+    .mostrar .bubble {
+        opacity: 1;
+    }
+</style>
+
+<script>
+  function mostrarRecuerdo(tipo) {
+    let recuerdoTexto = {
+        bodas: "❤️ El día en que nos dimos el Sí ante Dios ❤️",
+        serPadres: "🥰👶 La vez en que Nacio nuestra pequeña khalessi 👶🥰",
+        ejercito: "💂🏼‍♂️ Cuando te pusiste nerviosa y te quite la caserina de tu galil 💂🏼‍♂️",
+        plazaNorte: "💘 Se podria decir que fue nuestra primera cita 💘"
+    };
+
+    let divRecuerdo = document.getElementById("recuerdoAnimado");
+    
+    // Limpiar contenido anterior
+    divRecuerdo.innerHTML = "";
+
+    // Crear burbuja animada con texto estático
+    let burbuja = document.createElement("div");
+    burbuja.classList.add("bubble");
+    
+    let texto = document.createElement("div");
+    texto.classList.add("bubble-text");
+    texto.innerText = recuerdoTexto[tipo];
+    
+    // Agregar texto dentro de la burbuja
+    burbuja.appendChild(texto);
+
+    // Agregar burbuja al contenedor
+    divRecuerdo.appendChild(burbuja);
+
+    // Activar animación
+    divRecuerdo.classList.add("mostrar");
+
+    // Si el usuario vuelve a seleccionar, reiniciar animación
+    setTimeout(() => {
+        divRecuerdo.classList.remove("mostrar");
+        void divRecuerdo.offsetWidth; // Hack para reiniciar animación
+        divRecuerdo.classList.add("mostrar");
+    }, 10);
+}
+</script>
+
+
+<div id="carta" class="section">
+    <h2>Carta Especial</h2><p>❤️ Maleli Tupatiki😅 Te amo por quien eres y por cómo eres 🙈,una mujer fuerte💪, valiente 😌 decidida 😚 que no le teme a nada 🥰</p>
+    <p>Nunca me imaginé que llegariamos tan lejos 😱(tu sabes de lo que hablo) 🤭😅, sin embargo aqui estamos 😏</p>
+    <p>Y aunque a veces peleamos 🤪 la mayor parte del tiempo la pasamos jugando como amigos 🥰 niños 😍 y eso me encanta de ti ❤️</p>
+    
+    <p>❤️ FELIZ SAN VALENTÍN ❤️</p>
+    <p id="cartaTexto"></p>
+</div>
+
+<div id="mensajes" class="section">
+    <h2>Mensajes Personalizados</h2>
+    <form id="mensajeForm">
+        <textarea id="mensajeTexto" rows="5" placeholder="Escribe tu mensaje aquí..."></textarea>
+        <br>
+        <button type="button" onclick="guardarMensaje()">Guardar Mensaje</button>
+    </form>
+    <div id="mensajeGuardado" style="display:none;">
+        <h3>Tu mensaje:</h3>
+        <p id="mensajeMostrado"></p>
+    </div>
+</div>
+
+<script
+>
+function guardarMensaje() {
+    let mensaje = document.getElementById('mensajeTexto').value;
+    document.getElementBy
+}
+    let galleryImages = [
+        "foto12.jpg",
+        "foto06.jpg",
+        "foto10.jpg",
+        "foto07.jpg",
+        "foto03.jpg",
+        "foto02.jpg"
+    ];
+    let galleryIndex = 0;
+
+    function prevImage() {
+        galleryIndex = (galleryIndex - 1 + galleryImages.length) % galleryImages.length;
+        document.getElementById("galleryImage").src = galleryImages[galleryIndex];
+    }
+
+    function nextImage() {
+        galleryIndex = (galleryIndex + 1) % galleryImages.length;
+        document.getElementById("galleryImage").src = galleryImages[galleryIndex];
+    }
+
+    function toggleMenu() {
+        let menu = document.getElementById("menu");
+        menu.style.display = menu.style.display === "block" ? "none" : "block";
+    }
+
+    function showSection(sectionId) {
+        document.querySelectorAll(".section").forEach(sec => sec.classList.remove("active"));
+        document.getElementById(sectionId).classList.add("active");
+        document.getElementById("menu").style.display = "none";
+    }
+
+    function cambiarVideo(video) {
+        document.getElementById("videoSource").src = video;
+        document.getElementById("videoPlayer").load();
+        document.getElementById("videoPlayer").play();
+    }
+
+function escribirCarta() {
+    let texto = "Maleli Tupatiki\n\nTe amo por quien eres y por\n\ncómo eres, mujer fuerte, valiente,\n\ndecidida. Eres mi todo.\n\nFELIZ SAN VALENTÍN";
+    let i = 0;
+    let elemento = document.getElementById("cartaTexto");
+
+    // Asegurar que el párrafo esté vacío antes de escribir
+    elemento.innerHTML = "";
+    
+    // Mostrar la sección de la carta antes de empezar a escribir
+    showSection("carta");
+
+    let intervalo = setInterval(() => {
+        if (i < texto.length) {
+            elemento.innerHTML += texto[i];
+            i++;
+        } else {
+            clearInterval(intervalo);
+        }
+    }, 100);
+}
+
+// Asegurar que se llama a la función al hacer clic en la opción "Carta Especial"
+document.querySelector("[onclick='showSection(\"carta\")']").setAttribute("onclick", "showSection('carta'); escribirCarta();");
+
+    function generarCorazones() {
+        setInterval(() => {
+            let heart = document.createElement("div");
+            heart.classList.add("heart");
+            heart.innerHTML = "❤";
+            heart.style.left = Math.random() * 100 + "vw";
+            heart.style.animationDuration = Math.random() * 2 + 3 + "s";
+            document.getElementById("heartContainer").appendChild(heart);
+            setTimeout(() => heart.remove(), 4000);
+        }, 500);
+    }
+
+
+    window.onload = generarCorazones;
+</script>
+
+</body>
+</html>
